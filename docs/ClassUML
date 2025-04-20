@@ -5,15 +5,25 @@ IDeviceContainer --> IHUBClient
 IDeviceContainer *-- IHUBDevice
 IHubResponse <|.. HubResponse
 
-IHUBDevice <|.. ScaleDevice
+IHUBDevice <|.. ScaleDeviceBase
+ScaleDeviceBase <|-- ScaleDeviceTCP
+ITCPDevice <|.. ScaleDeviceTCP
 
 HubRegistrationRequest <|-- HubRegistrationResponse
 
-interface IDeviceContainer  {
+interface IDeviceContainer<IHUBDevice, TMessage>  {
+    .. Bridges HUB and Device ..
+    .. Properties ..
+    string HubMessageEndpointId { get; set }
+    .. Members .. 
+    IHUBDevice<TMessage> device
     ..Methods..
     Task StartAsync(CancellationToken token)
-    HubRegistrationResponse RegisterDevice(IHUBDevice device)
-    void HandleNewMessageEvent<T>(object sender, T message)
+    HubRegistrationResponse RegisterDevice()
+    HubRegistrationRequest GetHubRegistrationRequest()
+    .. Event Handlers ..
+    void HandleEventNewMessage(object sender, TMessage message)
+    void HandleEventConnectionStatusChanged(object sender, ConnectionArgs args)
 }
 
 interface IHUBContentSerializer {
@@ -21,15 +31,23 @@ interface IHUBContentSerializer {
     StringContent GetContent<T>(T obj)
 }
 
-interface IHUBDevice<T> {
+interface IHUBDevice<TMessage> {
     .. Events ..
-    event EventHandler<T> NewMessage
+    event EventHandler<ConnectionArgs> ConnectionStatusChanged
+    event EventHandler<TMessage> NewMessage
     .. Properties ..
     DeviceType DeviceType {get; }
     string DeviceId { get; }
-    string HubMessageEndpointId { get; set }
     .. Methods ..
-    HubRegistrationRequest GetHubRegistrationRequest()
+    Task<bool> ConnectAsync()
+    Task DisconnectAsync()
+}
+
+interface ITCPDevice {
+    event EventHandler<byte[]> DataReceived
+    .. Methods ..
+    Task<bool> ConnectAsync()
+    Task DisconnectAsync()
 }
 
 interface IHUBClient {
@@ -74,9 +92,17 @@ class HubRegistrationResponse {
     string MessageEndpointId { get; }
 }
 
-class ScaleDevice {
+abstract class ScaleDeviceBase {
+    .. Defines a Scale device base ..
     DeviceType DeviceType => DeviceType.Scale
-    ScaleDevice ScaleDevice(string scaleId)
+    ScaleDeviceBase ScaleDeviceBase(string scaleId)
+}
+
+class ScaleDeviceTCP {
+    .. Defines a Scale device with TCP connectivity ..
+    
+    .. Event Handlers ..
+    void HandleEventNewMessage<byte[]>(object sender, byte[] data)
 }
 
 enum DeviceType {
