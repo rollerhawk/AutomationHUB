@@ -10,8 +10,8 @@ Ein Gerät (Industriewaage) wird als Prozess gestartet, registriert sich beim HU
 
 ## 🛠 Aufgaben
 - #1 Erstellen MVP
-- #3 Programmieren des Devices
-- #4 Programmieren des HUBs
+- #2 Programmieren des Devices
+- #3 Programmieren des HUBs
 
 ## ❌ Nicht im MVP
 - Webhooks
