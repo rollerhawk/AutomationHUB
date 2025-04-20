@@ -1,0 +1,87 @@
+@startuml
+IHUBContentSerializer  <|-- IHUBDevice
+IHUBClient <|.. HUBClient
+IDeviceContainer --> IHUBClient
+IDeviceContainer *-- IHUBDevice
+IHubResponse <|.. HubResponse
+
+IHUBDevice <|.. ScaleDevice
+
+HubRegistrationRequest <|-- HubRegistrationResponse
+
+interface IDeviceContainer  {
+    ..Methods..
+    Task StartAsync(CancellationToken token)
+    HubRegistrationResponse RegisterDevice(IHUBDevice device)
+    void HandleNewMessageEvent<T>(object sender, T message)
+}
+
+interface IHUBContentSerializer {
+    .. Returns the object of type T as string content ..
+    StringContent GetContent<T>(T obj)
+}
+
+interface IHUBDevice<T> {
+    .. Events ..
+    event EventHandler<T> NewMessage
+    .. Properties ..
+    DeviceType DeviceType {get; }
+    string DeviceId { get; }
+    string HubMessageEndpointId { get; set }
+    .. Methods ..
+    HubRegistrationRequest GetHubRegistrationRequest()
+}
+
+interface IHUBClient {
+    .. Takes care of connectivity ..
+    .. Properties ..
+    Uri Uri { get; }
+    .. Methods ..
+    Uri BuildEndpoint(DeviceType type, string messageEndpointId)
+    Task<IHubResponse> PostAsync(Uri endpoint, StringContent content)
+    Task<IHubResponse> GetAsync(Uri endpoint, StringContent content)
+}
+
+
+interface IHubResponse<ResponseType> {
+    ResponseType Response
+    bool IsOK
+}
+
+class HUBClient {
+    .. Members ..
+    HttpClient hubHttpClient
+    ConcurrentDictionary<DeviceType, Uri> deviceEndpoints
+    .. Methods ..
+    void GetHUBEndpoints()
+}
+
+class HubResponse {
+    HttpResponseMessage HttpResponseMessage
+}
+
+class HubRegistrationRequest {
+    .. Capsules a Hub registration Request ..
+    DeviceType DeviceType { get; }
+    string DeviceId { get; }
+}
+
+class HubRegistrationResponse {
+    .. Capsules a Hub registration response ..
+    .. relative Uri for registered device ..
+    Uri MessageEndpoint { get; }
+    .. id of the registered device ..
+    string MessageEndpointId { get; }
+}
+
+class ScaleDevice {
+    DeviceType DeviceType => DeviceType.Scale
+    ScaleDevice ScaleDevice(string scaleId)
+}
+
+enum DeviceType {
+    Scale
+    Scanner
+}
+
+@enduml
