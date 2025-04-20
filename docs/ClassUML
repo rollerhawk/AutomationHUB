@@ -102,7 +102,7 @@ class ScaleDeviceTCP {
     .. Defines a Scale device with TCP connectivity ..
     
     .. Event Handlers ..
-    void HandleEventNewMessage<byte[]>(object sender, byte[] data)
+    void HandleEventDataReceived<byte[]>(object sender, byte[] data)
 }
 
 enum DeviceType {
