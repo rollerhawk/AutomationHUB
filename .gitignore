@@ -52,3 +52,7 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+/.vs/AutomationHUB/FileContentIndex
+/.vs/AutomationHUB/DesignTimeBuild
+/.vs/AutomationHUB/v17
+/.vs
