@@ -1,0 +1,26 @@
+{
+  "DeviceId": "scanner1",
+  "DeviceType": "Scanner",
+  "Connection": {
+    "Protocol": "TCP",
+    "Address": "127.0.0.1:50678"
+  },
+  "ProcessorConfig": {
+    "ProcessorType": "StxEtx",
+    "StartMarker": 2,
+    "EndMarker": 3,
+    "SplitDelimiter": ";",
+    "FieldMappings": [
+      {
+        "Index": 0,
+        "Name": "Barcode",
+        "Type": "STRING"
+      },
+      {
+        "Index": 1,
+        "Name": "Timestamp",
+        "Type": "STRING"
+      }
+    ]
+  }
+}
