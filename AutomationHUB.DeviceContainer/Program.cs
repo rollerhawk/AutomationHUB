@@ -1,18 +1,7 @@
-using AutomationHUB.DeviceContainer;
-using AutomationHUB.DeviceContainer.Factories;
-using AutomationHUB.Shared.Configuration;
+using AutomationHUB.DeviceContainer.Extensions;
 
 var builder = Host.CreateApplicationBuilder(args);
-builder.Services.AddHostedService<Worker>();
-builder.Services.AddSingleton<IDeviceConnectorFactory, DeviceConnectorFactory>();
-builder.Services.AddSingleton<IByteDataProcessorFactory, ByteDataProcessorFactory>();
-builder.Services.AddSingleton<JsonDeviceConfigLoader>();
-
-builder.Services.AddLogging(config =>
-{
-    config.AddConsole();
-    config.SetMinimumLevel(LogLevel.Debug);
-});
+builder.Services.AddDeviceContainerDependencies(builder.Configuration);
 
 var host = builder.Build();
 host.Run();
