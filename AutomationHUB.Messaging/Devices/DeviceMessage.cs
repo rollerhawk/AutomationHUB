@@ -11,6 +11,7 @@ namespace AutomationHUB.Messaging.Devices
     [JsonDerivedType(typeof(DeviceMessage), nameof(DeviceMessage))]
     public class AutomationMessage
     {
+        [JsonPropertyOrder(int.MinValue)]
         public string MessageType { get => GetType().Name; }
         public string AutomationID { get; protected set; } = default!;
         public Dictionary<string, object> Fields { get; set; } = new Dictionary<string, object>();

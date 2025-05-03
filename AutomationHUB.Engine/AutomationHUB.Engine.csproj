@@ -10,11 +10,13 @@
   <ItemGroup>
     <PackageReference Include="Elsa" Version="3.6.0-preview.2906" />
     <PackageReference Include="Elsa.Persistence.EntityFramework.Sqlite" Version="2.15.1" />
+    <PackageReference Include="Elsa.Server.Api" Version="2.15.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AutomationHUB.Engine.Activities\AutomationHUB.Engine.Activities.csproj" />
+    <ProjectReference Include="..\AutomationHUB.Messaging.Nats\AutomationHUB.Messaging.Nats.csproj" />
     <ProjectReference Include="..\AutomationHUB.Messaging\AutomationHUB.Messaging.csproj" />
   </ItemGroup>
 </Project>

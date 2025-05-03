@@ -17,47 +17,17 @@ namespace AutomationHUB.Engine.MessageConsumers
     /// Processes DeviceMessage and triggers the corresponding Elsa activity.
     /// </summary>
     public class DeviceMessageElsaConsumer(
-        IWorkflowRuntime runtime,
-        ILogger<DeviceMessageElsaConsumer> logger) : IMessageConsumer<DeviceMessage>
+        ILogger<DeviceMessageElsaConsumer> logger, IEventPublisher elsaPublisher, IWorkflowRuntime workflowRuntime) : IMessageConsumer<DeviceMessage>
     {
-        private readonly IWorkflowRuntime _runtime = runtime;
+        private readonly IWorkflowRuntime _workflowRuntime = workflowRuntime;
+        private readonly IEventPublisher _elsaPublisher = elsaPublisher;
         private readonly ILogger<DeviceMessageElsaConsumer> _logger = logger;
 
         public async Task HandleAsync(DeviceMessage message, CancellationToken ct)
         {
             _logger.LogTrace("Handling DeviceMessage for {DeviceId}", message.DeviceId);
 
-            var client = await _runtime.CreateClientAsync(ct);
-
-            _logger.LogTrace("Creating Elsa client for DeviceMessage");
-
-            // 2) Erstelle das Handle für genau deine Event-Activity
-            //    Der TypeName muss exakt mit dem übereinstimmen, was Elsa intern registriert hat.
-            var activityTypeName = ActivityTypeNameHelper.GenerateTypeName<DeviceMessageEvent>();
-
-            _logger.LogTrace("Generated ActivityTypeName: {ActivityTypeName}", activityTypeName);
-
-            var handle = new ActivityHandle
-            {
-                // Name der Activity
-                ActivityId = activityTypeName,
-                //zB. Scanner1, Waage3 usw.
-                ActivityInstanceId = message.AutomationID
-            };
-
-            // 3) Pack dein DTO als Input in den Request
-            var request = new RunWorkflowInstanceRequest
-            {
-                ActivityHandle = handle,
-                Input = new Dictionary<string, object>
-                {
-                    { nameof(DeviceMessage), message }
-                },
-            };
-
-            _logger.LogTrace("Running instance with request: {Request}", request);
-
-            await client.RunInstanceAsync(request, ct);
+            await _elsaPublisher.PublishAsync(message.AutomationID+"."+message.MessageType, payload: message, cancellationToken: ct);
 
             _logger.LogTrace("DeviceMessage processed");
         }

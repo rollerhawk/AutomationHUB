@@ -7,6 +7,8 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using AutomationHUB.Messaging.Devices;
 using AutomationHUB.Messaging.Interfaces;
+using Elsa.Workflows.Runtime;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -14,21 +16,21 @@ namespace AutomationHUB.Engine.Adapters;
 public class SubscriberTriggerHostedService : BackgroundService
 {
     private readonly ISubscriber _subscriber;
-    private readonly IMessageConsumerResolver _resolver;
     private readonly ILogger<SubscriberTriggerHostedService> _logger;
+    private readonly IServiceProvider _serviceProvider;
     private readonly JsonSerializerOptions _serializerOptions;
-    private readonly string _subjectPattern;
+    private readonly string _subjectPattern;    
 
     public SubscriberTriggerHostedService(
         ISubscriber subscriber,
-        IMessageConsumerResolver resolver,
         IConfiguration config,
-        ILogger<SubscriberTriggerHostedService> logger)
+        ILogger<SubscriberTriggerHostedService> logger,
+        IServiceProvider serviceProvider)
     {
         _subscriber = subscriber;
-        _resolver = resolver;
         _logger = logger;
-        _subjectPattern = config["Subscriber:Subject"] ?? "devices.*.*";
+        _serviceProvider = serviceProvider;
+        _subjectPattern = config["Subscriber:Subject"] ?? "Scanner.*";
         _serializerOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,
@@ -50,14 +52,30 @@ public class SubscriberTriggerHostedService : BackgroundService
                   "Received {MessageType} (@{Subject})",
                   message.MessageType, _subjectPattern);
 
-                // löse den passenden Consumer
-                await _resolver.ConsumeAsync(message, ct);
+                // ermittle den tatsächlichen CLR-Typ
+                var messageType = message.GetType();
+                // baue das generic Interface IConsumer<messageType>
+                var consumerInterface = typeof(IMessageConsumer<>).MakeGenericType(messageType);
+
+                // 1) Erstelle einen neuen Scope pro Nachricht
+                using var scope = _serviceProvider.CreateScope();
+
+                // 2) Hole den scoped Consumer aus genau diesem Scope
+                var consumer = scope.ServiceProvider
+                                     .GetRequiredService(consumerInterface);
+
+                var method = consumerInterface.GetMethod(nameof(IMessageConsumer<AutomationMessage>.HandleAsync), new[] { messageType, typeof(CancellationToken) }) ?? throw new InvalidOperationException("HandleAsync(DeviceMessage, CancellationToken) nicht gefunden.");
+
+                // 3) Rufe es auf – Invoke liefert ein object zurück, das ein Task ist
+                await (Task)method.Invoke(
+                    consumer,
+                    new object[] { message, ct })!;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing message");
             }
-        });
+        });       
 
         return Task.CompletedTask;
     }

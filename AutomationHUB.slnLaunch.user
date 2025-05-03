@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "AutomationHUB.DeviceContainer\\AutomationHUB.DeviceContainer.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "AutomationHUB.Engine\\AutomationHUB.Engine.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

@@ -1,4 +1,5 @@
 ﻿using AutomationHUB.Messaging.Devices;
+using Elsa.Expressions.Models;
 using Elsa.Workflows;
 using Microsoft.Extensions.Logging;
 
@@ -8,18 +9,11 @@ namespace AutomationHUB.Engine.Activities.Events;
 /// Elsa Activity for Handling DeviceMessage
 /// </summary>
 /// <param name="logger"></param>
-public class DeviceMessageEvent(ILogger<DeviceMessageEvent> logger) : AutomationMessageEvent<DeviceMessage>(logger)
+public class DeviceMessageEvent() : AutomationMessageEvent<DeviceMessage>()
 {
-    protected override ValueTask OnEventReceivedAsync(ActivityExecutionContext context, DeviceMessage? input)
+    public required string DeviceId { get => AutomationId; set => AutomationId = value; }
+    protected override void OnEventReceived(ActivityExecutionContext context, DeviceMessage? input)
     {
-        if (input is null)
-        {
-            _logger.LogWarning("Received null DeviceMessage");         
-        }
-        else
-        {
-            _logger.LogInformation("Received DeviceMessage: {message}", input.ToString());
-        }
-        return ValueTask.CompletedTask;
+        int a = 2;
     }
 }

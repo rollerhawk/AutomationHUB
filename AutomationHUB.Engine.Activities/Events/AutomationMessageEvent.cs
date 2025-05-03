@@ -1,6 +1,7 @@
 ﻿using AutomationHUB.Messaging.Devices;
 using AutomationHUB.Messaging.Interfaces;
 using Elsa.Expressions.Models;
+using Elsa.Extensions;
 using Elsa.Workflows;
 using Elsa.Workflows.Runtime;
 using Elsa.Workflows.Runtime.Activities;
@@ -13,9 +14,11 @@ using System.Threading.Tasks;
 
 namespace AutomationHUB.Engine.Activities.Events
 {
-    public abstract class AutomationMessageEvent<T>(ILogger logger) : EventBase<T> where T : AutomationMessage
+    public abstract class AutomationMessageEvent<T> : EventBase<T>
     {
-        protected readonly ILogger _logger = logger;
+        protected string AutomationId { get; set; } = default!;
+
+        protected AutomationMessageEvent() : base() { }
 
         /// <summary>
         /// Name of the Event that this Activity Listens to
@@ -24,7 +27,7 @@ namespace AutomationHUB.Engine.Activities.Events
         /// <returns></returns>
         protected override string GetEventName(ExpressionExecutionContext context)
         {
-            return typeof(T).Name;
+            return AutomationId + "." + typeof(T).Name;
         }
 
         /// <summary>
@@ -33,6 +36,21 @@ namespace AutomationHUB.Engine.Activities.Events
         /// <param name="context"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        protected abstract override ValueTask OnEventReceivedAsync(ActivityExecutionContext context, T? input);
+        protected abstract override void OnEventReceived(ActivityExecutionContext context, T? input);
+
+        protected override ValueTask ExecuteAsync(ActivityExecutionContext context)
+        {
+            var eventName = GetEventName(context.ExpressionExecutionContext);
+            context.WaitForEvent(eventName, AutomationEventReceivedAsync);
+            return default;
+        }
+
+        protected virtual async ValueTask AutomationEventReceivedAsync(ActivityExecutionContext context)
+        {
+            var input = (T?)context.GetEventInput();
+            Result.Set(context, input);
+            await OnEventReceivedAsync(context, input);
+            await context.CompleteActivityAsync();
+        }
     }
 }
