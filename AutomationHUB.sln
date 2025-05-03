@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomationHUB.Messaging", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomationHUB.Messaging.Nats", "AutomationHUB.Messaging.Nats\AutomationHUB.Messaging.Nats.csproj", "{6068E9D5-5F47-464C-A861-CC727EC6D2FA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomationHUB.Engine", "AutomationHUB.Engine\AutomationHUB.Engine.csproj", "{EADB1F04-E6E8-4529-8809-6C44B968FAE2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomationHUB.Engine.Activities", "AutomationHUB.Engine.Activities\AutomationHUB.Engine.Activities.csproj", "{877443E0-10C3-4166-B27C-840F76FC638B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{6068E9D5-5F47-464C-A861-CC727EC6D2FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6068E9D5-5F47-464C-A861-CC727EC6D2FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6068E9D5-5F47-464C-A861-CC727EC6D2FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EADB1F04-E6E8-4529-8809-6C44B968FAE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EADB1F04-E6E8-4529-8809-6C44B968FAE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EADB1F04-E6E8-4529-8809-6C44B968FAE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EADB1F04-E6E8-4529-8809-6C44B968FAE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{877443E0-10C3-4166-B27C-840F76FC638B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{877443E0-10C3-4166-B27C-840F76FC638B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{877443E0-10C3-4166-B27C-840F76FC638B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{877443E0-10C3-4166-B27C-840F76FC638B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

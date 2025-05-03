@@ -1,4 +1,4 @@
-﻿using AutomationHUB.Shared.Interfaces;
+﻿using AutomationHUB.Messaging.Interfaces;
 using NATS.Client;
 using System;
 using System.Collections.Generic;

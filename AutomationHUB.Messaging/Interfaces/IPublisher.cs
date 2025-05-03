@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AutomationHUB.Shared.Interfaces
+namespace AutomationHUB.Messaging.Interfaces
 {
     public interface IPublisher
     {

@@ -1,7 +1,7 @@
 using AutomationHUB.DeviceContainer.Factories;
 using AutomationHUB.Messaging.Devices;
+using AutomationHUB.Messaging.Interfaces;
 using AutomationHUB.Shared.Configuration;
-using AutomationHUB.Shared.Interfaces;
 using NATS.Client;
 using System.Text.Json;
 
