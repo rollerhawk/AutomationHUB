@@ -3,11 +3,11 @@
     "Name": "New Profile",
     "Projects": [
       {
-        "Path": "AutomationHUB.DeviceContainer\\AutomationHUB.DeviceContainer.csproj",
+        "Path": "AutomationHUB.Engine.Api\\AutomationHUB.Engine.Api.csproj",
         "Action": "Start"
       },
       {
-        "Path": "AutomationHUB.Engine\\AutomationHUB.Engine.csproj",
+        "Path": "AutomationHUB.Portal\\AutomationHUB.Portal.csproj",
         "Action": "Start"
       }
     ]
