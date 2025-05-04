@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AutomationHUB.Engine.Elsa\AutomationHUB.Engine.Elsa.csproj" />
+    <ProjectReference Include="..\AutomationHUB.Engine.Services\AutomationHUB.Engine.Services.csproj" />
+    <ProjectReference Include="..\AutomationHUB.Messaging.Nats\AutomationHUB.Messaging.Nats.csproj" />
+  </ItemGroup>
+
+</Project>

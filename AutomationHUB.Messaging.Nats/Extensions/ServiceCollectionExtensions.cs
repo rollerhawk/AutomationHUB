@@ -33,5 +33,16 @@ namespace AutomationHUB.Messaging.Nats.Extensions
             services.AddSingleton<IPublisher<T>, NatsPublisher<T>>();
             return services;
         }
+
+        /// <summary>
+        /// Non-Generic Byte Data NatsSubscriber
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddNatsSubscriber(this IServiceCollection services)
+        {
+            services.AddSingleton<ISubscriber, NatsSubscriber>();
+            return services;
+        }
     }
 }
