@@ -15,6 +15,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomationHUB.Engine", "Aut
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomationHUB.Engine.Activities", "AutomationHUB.Engine.Activities\AutomationHUB.Engine.Activities.csproj", "{877443E0-10C3-4166-B27C-840F76FC638B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomationHUB.Engine.ElsaServer", "AutomationHUB.Engine.ElsaServer\AutomationHUB.Engine.ElsaServer.csproj", "{FCD02052-B834-470C-BB19-8602526E2F53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomationHUB.Engine.ElsaStudioWasm", "AutomationHUB.Engine.ElsaStudioWasm\AutomationHUB.Engine.ElsaStudioWasm.csproj", "{3965B8C8-8B19-478F-A276-19D9336B88DF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +49,14 @@ Global
 		{877443E0-10C3-4166-B27C-840F76FC638B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{877443E0-10C3-4166-B27C-840F76FC638B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{877443E0-10C3-4166-B27C-840F76FC638B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCD02052-B834-470C-BB19-8602526E2F53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCD02052-B834-470C-BB19-8602526E2F53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCD02052-B834-470C-BB19-8602526E2F53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCD02052-B834-470C-BB19-8602526E2F53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3965B8C8-8B19-478F-A276-19D9336B88DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3965B8C8-8B19-478F-A276-19D9336B88DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3965B8C8-8B19-478F-A276-19D9336B88DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3965B8C8-8B19-478F-A276-19D9336B88DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

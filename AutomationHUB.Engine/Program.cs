@@ -19,12 +19,9 @@ builder.Services
         .AddActivity<DeviceMessageEvent>();
     });
 
-//builder.Services.AddElsaApiEndpoints();    
-
 builder.Services.AddHostedService<SubscriberTriggerHostedService>()
                 .AddNats(builder.Configuration)
-                .AddSingleton<ISubscriber, NatsSubscriber>()
-                .AddSingleton<IMessageConsumerResolver, MessageConsumerResolver>();
+                .AddSingleton<ISubscriber, NatsSubscriber>();
 
 builder.Services.Scan(scan => scan
   .FromAssemblyOf<DeviceMessageElsaConsumer>()
