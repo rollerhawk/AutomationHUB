@@ -1,26 +1,27 @@
 using AutomationHUB.DeviceContainer.Factories;
 using AutomationHUB.Messaging.Devices;
 using AutomationHUB.Messaging.Interfaces;
+using AutomationHUB.Messaging.Registry;
 using AutomationHUB.Shared.Configuration;
 using NATS.Client;
 using System.Text.Json;
 
 namespace AutomationHUB.DeviceContainer
 {
-    public class Worker(
-    ILogger<Worker> logger,
+    public class DeviceService(
+    ILogger<DeviceService> logger,
     IConfiguration config,
     IDeviceConnectorFactory connectorFactory,
     IByteDataProcessorFactory processorFactory,
     JsonDeviceConfigLoader loader,
-    IPublisher<DeviceMessage> publisher) : BackgroundService
+    IPublisher publisher) : BackgroundService
     {
-        private readonly ILogger<Worker> _logger = logger;
+        private readonly ILogger<DeviceService> _logger = logger;
         private readonly IConfiguration _configuration = config;
         private readonly IDeviceConnectorFactory _connectorFactory = connectorFactory;
         private readonly IByteDataProcessorFactory _processorFactory = processorFactory;
         private readonly JsonDeviceConfigLoader _loader = loader;
-        private readonly IPublisher<DeviceMessage> _publisher = publisher;
+        private readonly IPublisher _publisher = publisher;
         private DeviceConfiguration _deviceConfig = null!;
 
         protected override async Task ExecuteAsync(CancellationToken ct)
@@ -45,6 +46,8 @@ namespace AutomationHUB.DeviceContainer
                 if (await connector.ConnectAsync(ct))
                 {
                     _logger.LogInformation("Connected to device.");
+
+                    PublishRegistryMessage();
                 }
                 else
                 {
@@ -75,22 +78,33 @@ namespace AutomationHUB.DeviceContainer
             }
         }
 
-        private void PublishDeviceMessage(Dictionary<string, object> processedFields)
+        private void PublishRegistryMessage()
         {
-            //device.device1
-            var subject = $"{_deviceConfig.DeviceType}.{_deviceConfig.DeviceId}";
-
-            var deviceMsg = new DeviceMessage
+            var regMsg = new DeviceRegistryMessage
             {
-                DeviceId = _deviceConfig.DeviceId,
-                DeviceType = _deviceConfig.DeviceType,
-                Fields = processedFields,
-                Timestamp = DateTime.UtcNow
+                Id = _deviceConfig.DeviceId,
+                Entity = _deviceConfig.DeviceType
             };
 
-            _publisher.Publish(subject, deviceMsg);
+            var topic = _publisher.Publish(regMsg);
 
-            _logger.LogInformation("Published data to subject: {subject}", subject);
+            _logger.LogInformation("Published device registry message: {message}", JsonSerializer.Serialize(regMsg));
+
+            _logger.LogInformation("Published data to topic: {subject}", topic);
+        }
+
+        private void PublishDeviceMessage(Dictionary<string, object> processedFields)
+        {
+            var deviceMsg = new DeviceMessage
+            {
+                Id = _deviceConfig.DeviceId,
+                Entity = _deviceConfig.DeviceType,
+                Fields = processedFields
+            };
+
+            var topic = _publisher.Publish(deviceMsg);
+
+            _logger.LogInformation("Published data to topic: {subject}", topic);
         }
     }
 }

@@ -4,8 +4,8 @@ using AutomationHUB.Messaging.Nats.Extensions;
 
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddDeviceContainerDependencies()
-                .AddNats(builder.Configuration)
-                .AddNatsPublisher<DeviceMessage>();
+                .AddNats(builder.Configuration);
+                
 
 var host = builder.Build();
 host.Run();

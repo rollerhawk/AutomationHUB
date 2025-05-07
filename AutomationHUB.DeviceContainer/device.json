@@ -7,8 +7,8 @@
   },
   "ProcessorConfig": {
     "ProcessorType": "StxEtx",
-    "StartMarker": 2,
-    "EndMarker": 3,
+    "StartMarker": 37,
+    "EndMarker": 37,
     "SplitDelimiter": ";",
     "FieldMappings": [
       {

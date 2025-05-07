@@ -1,5 +1,4 @@
-﻿using AutomationHUB.Messaging.Devices;
-using AutomationHUB.Messaging.Interfaces;
+﻿using AutomationHUB.Messaging.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

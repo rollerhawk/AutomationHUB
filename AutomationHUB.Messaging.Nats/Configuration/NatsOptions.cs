@@ -9,5 +9,6 @@ namespace AutomationHUB.Messaging.Nats.Configuration
     public class NatsOptions
     {
         public string Url { get; set; } = default!;
+        public string Prefix { get; set; } = default!;
     }
 }

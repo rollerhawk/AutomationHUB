@@ -1,35 +1,30 @@
-﻿using System;
+﻿using AutomationHUB.Messaging.Attributes;
+using AutomationHUB.Messaging.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace AutomationHUB.Messaging.Devices
-{
-    [JsonPolymorphic(TypeDiscriminatorPropertyName = nameof(MessageType))]
-    [JsonDerivedType(typeof(DeviceMessage), nameof(DeviceMessage))]
-    public class AutomationMessage
-    {
-        [JsonPropertyOrder(int.MinValue)]
-        public string MessageType { get => GetType().Name; }
-        public string AutomationID { get; protected set; } = default!;
-        public Dictionary<string, object> Fields { get; set; } = new Dictionary<string, object>();
-        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
-        public override string ToString()
-        {
-            return $"Fields={string.Join(", ", Fields)}, Timestamp={Timestamp}";
-        }
-    }
+namespace AutomationHUB.Messaging.Devices;
 
-    public class DeviceMessage : AutomationMessage
-    {
-        public string DeviceId { get => base.AutomationID; set => base.AutomationID = value; }
-        public string DeviceType { get; set; } = string.Empty;
+[NATSDomain(Domain = "devices")]
+public class DeviceMessage : AutomationMessage, IHasFields
+{    
+    /// <summary>
+    /// DeviceType
+    /// </summary>
+    public override required string Entity { get; set; }
 
-        public override string ToString()
-        {
-            return $"DeviceMessage: DeviceId={DeviceId}, DeviceType={DeviceType}, {base.ToString()}";
-        }
+    /// <summary>
+    /// DeviceId
+    /// </summary>
+    public override required string Id { get; set; }
+
+    public Dictionary<string, object> Fields { get; set; } = default!;
+
+    public override string ToString()
+    {
+        return $"{base.ToString()} Fields=[{string.Join(',',Fields)}]";
     }
 }

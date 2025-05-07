@@ -1,11 +1,15 @@
 ﻿using AutomationHUB.Engine.Elsa.Activities;
+using AutomationHUB.Engine.Elsa.Providers;
 using Elsa.EntityFrameworkCore.Extensions;
 using Elsa.EntityFrameworkCore.Modules.Management;
 using Elsa.EntityFrameworkCore.Modules.Runtime;
 using Elsa.Extensions;
+using Elsa.Workflows;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.CodeAnalysis.FlowAnalysis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AutomationHUB.Engine.Elsa.Extensions;
 
@@ -49,11 +53,17 @@ public static class ServiceCollectionExtensions
             elsa.UseHttp(http => http.ConfigureHttpOptions = options => configuration.GetSection("Http").Bind(options));
 
             // Register custom activities from the application, if any.
-            elsa.AddActivitiesFrom<IAutomationMessageEvent>();
+            //elsa.AddActivitiesFrom<IAutomationMessageEvent>();            
 
-            // Register custom workflows from the application, if any.
-            elsa.AddWorkflowsFrom<IAutomationMessageEvent>();
+            //// Register custom workflows from the application, if any.
+            //elsa.AddWorkflowsFrom<IAutomationMessageEvent>();
         });
+
+        // 2) Then remove the default provider…
+        services.RemoveAll<IActivityProvider>();
+
+        // 3) …and add yours
+        services.AddSingleton<IActivityProvider, AutomationDeviceActivityProvider>();
 
         return services;
     }

@@ -22,12 +22,12 @@ public class TestScannerWorkflow : WorkflowBase
                 new DeviceMessageEvent
                 {                    
                     CanStartWorkflow = true,
-                    DeviceId = "scanner1"
+                    DeviceId = new("scanner1")
                 },
                 new WriteLine("Workflow Started"),
                 new DeviceMessageEvent
                 {
-                    DeviceId = "scanner2"
+                    DeviceId = new("scanner2")
                 },
                 new WriteLine("Event Received")
             }

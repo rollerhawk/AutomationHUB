@@ -14,4 +14,11 @@ namespace AutomationHUB.Messaging.Interfaces
         void Subscribe(string subject, Func<byte[], CancellationToken, Task> handler);
     }
 
+    public interface ISubscriber<T> : ISubscriber where T : INATSPublishable
+    {
+        string GetSubject(T message);
+
+        void Subscribe(Func<T, CancellationToken, Task> handler);
+    }
+
 }

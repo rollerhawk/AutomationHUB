@@ -18,7 +18,7 @@ namespace AutomationHUB.DeviceContainer.Extensions
     {
         public static IServiceCollection AddDeviceContainerDependencies(this IServiceCollection services)
         {
-            services.AddHostedService<Worker>();
+            services.AddHostedService<DeviceService>();
             services.AddSingleton<IDeviceConnectorFactory, DeviceConnectorFactory>();
             services.AddSingleton<IByteDataProcessorFactory, ByteDataProcessorFactory>();
             services.AddSingleton<JsonDeviceConfigLoader>();

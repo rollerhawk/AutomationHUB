@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AutomationHUB.Messaging.Devices;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,11 +9,6 @@ namespace AutomationHUB.Messaging.Interfaces
 {
     public interface IPublisher
     {
-        void Publish(string subject, byte[] message);
-    }
-
-    public interface IPublisher<T> : IPublisher
-    {
-        void Publish(string subject, T message);
+        string Publish(INATSPublishable message);
     }
 }

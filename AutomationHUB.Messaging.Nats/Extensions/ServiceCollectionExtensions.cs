@@ -25,12 +25,10 @@ namespace AutomationHUB.Messaging.Nats.Extensions
                 cfOpts.Url = options.Url;
                 return new ConnectionFactory().CreateConnection(cfOpts);
             });
-            return services;
-        }
 
-        public static IServiceCollection AddNatsPublisher<T>(this IServiceCollection services)
-        {
-            services.AddSingleton<IPublisher<T>, NatsPublisher<T>>();
+            services.AddSingleton<INatsDomainTopicBuilder, NatsDomainTopicBuilder>();
+            services.AddSingleton<INatsMessageTopicBuilder, NatsMessageTopicBuilder>();
+            services.AddSingleton<IPublisher, NatsPublisher>();
             return services;
         }
 

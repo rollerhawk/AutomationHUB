@@ -4,6 +4,7 @@ using AutomationHUB.Engine.Services.Subscribers;
 using AutomationHUB.Messaging.Devices;
 using AutomationHUB.Messaging.Extensions;
 using AutomationHUB.Messaging.Nats.Extensions;
+using AutomationHUB.Messaging.Registry;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -30,7 +31,9 @@ builder.Services.AddElsaDependencies(configuration);
 //Nats
 builder.Services.AddNats(configuration);
 builder.Services.AddNatsSubscriber();
-builder.Services.AddHostedService<SubscriberTriggerHostedService>();
+//Messaging
+builder.Services.AddHostedService<DomainSubscriberHostedService<DeviceMessage>>();
+builder.Services.AddHostedService<DomainSubscriberHostedService<RegistryMessage>>();
 
 //Messaging
 builder.Services.AddAutomationMessageConsumer<DeviceMessage, DeviceMessageElsaConsumer>();

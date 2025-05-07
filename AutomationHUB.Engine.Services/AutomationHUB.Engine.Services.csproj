@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AutomationHUB.Messaging.Nats\AutomationHUB.Messaging.Nats.csproj" />
     <ProjectReference Include="..\AutomationHUB.Messaging\AutomationHUB.Messaging.csproj" />
     <ProjectReference Include="..\AutomationHUB.Shared\AutomationHUB.Shared.csproj" />
   </ItemGroup>
