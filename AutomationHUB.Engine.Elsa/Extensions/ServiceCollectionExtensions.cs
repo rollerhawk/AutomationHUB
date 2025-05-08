@@ -21,7 +21,8 @@ public static class ServiceCollectionExtensions
     /// <param name="services"></param>
     /// <returns></returns>
     public static IServiceCollection AddElsaDependencies(this IServiceCollection services, IConfiguration configuration)
-    {
+    {      
+        
         services.AddElsa(elsa =>
         {
             // Configure Management layer to use EF Core.

@@ -1,0 +1,12 @@
+@inherits BackendComponentBase
+
+<WorkflowDefinitionList EditWorkflowDefinition="@EditWorkflowDefinition" />
+
+
+@code
+{
+    /// <summary>
+    /// An event that is invoked when a workflow definition is edited.
+    /// </summary>
+    [Parameter] public EventCallback<string> EditWorkflowDefinition { get; set; }
+}

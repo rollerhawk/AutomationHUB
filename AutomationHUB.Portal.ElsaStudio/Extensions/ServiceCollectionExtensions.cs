@@ -28,7 +28,7 @@ namespace AutomationHUB.Portal.ElsaStudio.Extensions
             {
                 // Register the root components.    
                 options.RootComponents.RegisterCustomElsaStudioElements();
-            });
+            }).AddInteractiveServerComponents();
 
             // Register shell services and modules.
             services.AddCore();
