@@ -1,0 +1,14 @@
+﻿@using AutomationHUB.Portal.Common
+@using AutomationHUB.Portal.Features
+@using AutomationHUB.Portal.ViewModels
+@using MudBlazor
+@using Microsoft.AspNetCore.Components.Web
+
+<MudCard Class="palette-item" draggable="true" id="@Device.DeviceId" Elevation="3" Style="width:200px; margin:4px;">    
+    <DeviceCard Device="@Device"/>
+</MudCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public required DeviceViewModel Device { get; set; }
+}

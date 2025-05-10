@@ -83,7 +83,7 @@ public abstract class DomainSubscriberHostedService : BackgroundService
         var consumer = scope.ServiceProvider
                              .GetRequiredService(consumerInterface);
 
-        var method = consumerInterface.GetMethod(nameof(IMessageConsumer<AutomationMessage>.HandleAsync), new[] { messageType, typeof(CancellationToken) }) ?? throw new InvalidOperationException("HandleAsync(DeviceMessage, CancellationToken) nicht gefunden.");
+        var method = consumerInterface.GetMethod(nameof(IMessageConsumer<T>.HandleAsync), new[] { messageType, typeof(CancellationToken) }) ?? throw new InvalidOperationException("HandleAsync(DeviceMessage, CancellationToken) nicht gefunden.");
 
         // 3) Rufe es auf – Invoke liefert ein object zurück, das ein Task ist
         await (Task)method.Invoke(

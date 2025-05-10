@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AutomationHUB.Engine.Api.Contracts\AutomationHUB.Engine.Api.Contracts.csproj" />
     <ProjectReference Include="..\AutomationHUB.Engine.Elsa\AutomationHUB.Engine.Elsa.csproj" />
     <ProjectReference Include="..\AutomationHUB.Engine.Services\AutomationHUB.Engine.Services.csproj" />
     <ProjectReference Include="..\AutomationHUB.Messaging.Nats\AutomationHUB.Messaging.Nats.csproj" />

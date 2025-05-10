@@ -1,0 +1,24 @@
+﻿@using AutomationHUB.Portal.Common
+@using AutomationHUB.Portal.Diagrams.Models
+@using AutomationHUB.Portal.Features
+@using Blazor.Diagrams.Components
+@using AutomationHUB.Portal.ViewModels
+@using AutomationHUB.Portal.Diagrams
+@using Blazor.Diagrams.Components.Renderers
+
+<MudCard Style="width:200px; margin:0;">
+    <MudCardConnectionHeader IsConnected=@Node.Model.IsConnected />
+    <DeviceCard Device="Node.Model" />
+</MudCard>
+
+@foreach (var port in Node.Ports)
+    {
+        // In case you have any ports to show
+        // IMPORTANT: You are always in charge of rendering ports
+        <PortRenderer @key="port" Port="port" />
+    }
+
+@code {
+    // This gets filled by the library
+    [Parameter] public DeviceNodeModel Node { get; set; } = default!;
+}

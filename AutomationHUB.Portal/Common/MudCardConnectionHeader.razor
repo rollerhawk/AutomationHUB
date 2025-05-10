@@ -1,0 +1,38 @@
+@using AutomationHUB.Portal.ViewModels
+
+@if (IsConnected)
+{
+    <MudCardHeader Class="pa-0" Style="
+                    height:auto;
+                    justify-content: center;
+                    width:100%;
+                    background-color: rgba(0, 255, 0, 0.7);
+                    color:#fff;
+                    text-align:center;
+                    font-weight:bold;
+                    font-size:0.875rem;
+                    padding:2px 0;
+        ">
+        ONLINE
+    </MudCardHeader>
+}
+else
+{
+    <MudCardHeader Class="pa-0" Style="
+                            height:auto;
+                            justify-content: center;
+                            width:100%;
+                            background-color: rgba(255, 0, 0, 0.7);
+                            color:#fff;
+                            text-align:center;
+                            font-weight:bold;
+                            font-size:0.875rem;
+                            padding:2px 0;
+                                        ">
+        OFFLINE
+    </MudCardHeader>
+}
+@code {
+    [Parameter, EditorRequired]
+    public required bool IsConnected { get; set; }    
+}

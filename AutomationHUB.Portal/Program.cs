@@ -18,6 +18,13 @@ using MudBlazor.Services;
 using Microsoft.AspNetCore.Components.Web;
 using AutomationHUB.Portal.HttpMessageHandlers;
 using Elsa.Studio.Login.HttpMessageHandlers;
+using AutomationHUB.Engine.Api.Contracts;
+using AutomationHUB.Messaging.Devices;
+using AutomationHUB.Messaging.Extensions;
+using AutomationHUB.Messaging.Registry;
+using AutomationHUB.Messaging.Nats.Extensions;
+using AutomationHUB.Engine.Services.Subscribers;
+using AutomationHUB.Messaging.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -61,6 +68,26 @@ builder.Services.AddRemoteBackend(backendApiConfig);
 builder.Services.Replace(ServiceDescriptor.Scoped<IRemoteBackendAccessor, ComponentRemoteBackendAccessor>());
 builder.Services.AddWorkflowsModule();
 builder.Services.AddScoped<ITimeZoneProvider, LocalTimeZoneProvider>();
+
+builder.Services
+.AddHttpClient<IDeviceConfigurationService, DeviceConfigurationClient>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:5001");
+    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("ApiKey", Guid.Empty.ToString());
+});
+
+//Nats
+builder.Services.AddNats(configuration);
+builder.Services.AddNatsSubscriber();
+//Messaging
+builder.Services.AddHostedService<DomainSubscriberHostedService<DeviceMessage>>();
+
+//Messaging
+builder.Services.AddSingleton<DeviceStateService>();
+builder.Services.AddSingleton<IDeviceStateService,DeviceStateService>(sp => sp.GetRequiredService<DeviceStateService>());
+builder.Services.AddSingleton<IMessageConsumer<DeviceMessage>, DeviceStateService>(sp=> sp.GetRequiredService<DeviceStateService>());
+
+builder.Services.AddSingleton<PortalDeviceService>();
 
 // Build the application.
 var app = builder.Build();

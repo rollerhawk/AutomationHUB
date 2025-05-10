@@ -1,3 +1,5 @@
+using AutomationHUB.Engine.Api.Contracts;
+using AutomationHUB.Engine.Api.Services;
 using AutomationHUB.Engine.Elsa.Extensions;
 using AutomationHUB.Engine.Elsa.MessageConsumers;
 using AutomationHUB.Engine.Services.Subscribers;
@@ -38,6 +40,8 @@ builder.Services.AddHostedService<DomainSubscriberHostedService<RegistryMessage>
 //Messaging
 builder.Services.AddAutomationMessageConsumer<DeviceMessage, DeviceMessageElsaConsumer>();
 
+builder.Services.AddSingleton<IDeviceConfigurationService, DeviceConfigurationService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -47,9 +51,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.MapControllers();
 
 //Elsa
 app.UseElsaDependencies();
+
+app.MapControllers();
 
 app.Run("https://localhost:5001");

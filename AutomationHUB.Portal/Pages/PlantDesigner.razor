@@ -1,0 +1,159 @@
+﻿@page "/plant-designer"
+@using AutomationHUB.Portal.Diagrams.Models
+@using AutomationHUB.Portal.Diagrams.Nodes
+@using AutomationHUB.Portal.PaletteItems
+@using AutomationHUB.Portal.Services
+@using AutomationHUB.Portal.ViewModels
+@using AutomationHUB.Portal.Widgets
+@using Blazor.Diagrams
+@using Blazor.Diagrams.Components
+@using Blazor.Diagrams.Components.Widgets
+@using Blazor.Diagrams.Core.Geometry
+@using Blazor.Diagrams.Core.Models
+@using Blazor.Diagrams.Core.PathGenerators
+@using Blazor.Diagrams.Core.Routers
+@using Blazor.Diagrams.Options
+@using Microsoft.AspNetCore.Components
+@implements IDisposable
+
+@inject IJSRuntime JS
+@inject PortalDeviceService PortalDevices
+
+<PageTitle>Floor Planner</PageTitle>
+
+<div style="display:flex; height:100vh;">
+
+    <!-- PALETTE LINKS -->
+    <div style="width:fit-content; height:auto; border-right:1px solid #ccc; padding:10px;" @ref="paletteDiv">
+        <MudText Typo="Typo.h4" />
+        <MudList T="string">
+            @foreach (var itemGroup in GroupedItems)
+            {
+                <MudListItem T="string" Text="@itemGroup.Key" Expanded>
+                    <NestedList>
+                        @foreach (var item in itemGroup)
+                        {
+                            <DevicePaletteItem Device="@item" />
+                        }
+                    </NestedList>
+                </MudListItem>
+                <MudDivider />
+            }
+        </MudList>
+    </div>
+
+    <!-- CANVAS RECHTS -->
+    <div id="myCanvas" class="diagram-container" style="flex:1; position:relative;">
+        <CascadingValue Value="Diagram">
+            <DiagramCanvas @ref="DiagramCanvas">
+                <Widgets>
+                    <GridWidget Size="@GridSize" Mode="GridMode.Line" BackgroundColor="white" />
+                </Widgets>
+            </DiagramCanvas>
+        </CascadingValue>
+    </div>
+</div>
+
+@code {
+    private DotNetObjectReference<PlantDesigner>? _objRef;
+
+    ElementReference paletteDiv;
+
+    IEnumerable<DeviceViewModel> PaletteItems = Array.Empty<DeviceViewModel>();
+    //   = new()
+    // {
+    //   new("scanner", "Scanner STXETX", Icons.Material.Outlined.QrCodeScanner, true, DateTime.Now),
+    //   new("scale",  "Waage Bizerba", Icons.Material.Outlined.Scale, true, DateTime.Now),
+    //   new("scale",  "Waage Generic", Icons.Material.Outlined.LinearScale, true, DateTime.Now)
+    // };
+
+    IEnumerable<IGrouping<string, DeviceViewModel>> GroupedItems => PaletteItems.GroupBy(x => x.DeviceType);
+
+    // 2) Das Diagramm-Modell mit Grid & Snap aktiviert
+    private BlazorDiagram Diagram { get; set; } = new BlazorDiagram();
+
+    private DiagramCanvas DiagramCanvas { get; set; } = null!;
+
+    private int GridSize { get; set; } = 25;
+
+    [JSInvokable]
+    public async Task OnGhostDropped(string? paletteItemId, double x, double y)
+    {
+        // hier fügst du in C# deine Node an Position (x,y) ins Canvas ein
+        Console.WriteLine($"Item {paletteItemId} dropped at ({x}, {y})");
+
+        // 1) Screen → World
+        var worldX = (x - Diagram.Pan.X) / Diagram.Zoom;
+        var worldY = (y - Diagram.Pan.Y) / Diagram.Zoom;
+
+        // 2) im World-Raum auf das Grid runden
+        var snappedWorldX = Math.Floor(worldX / GridSize) * GridSize;
+        var snappedWorldY = Math.Floor(worldY / GridSize) * GridSize;
+
+        // Neue Node mit Hintergrund-Farbe aus der Palette
+        var node = new DeviceNodeModel(PaletteItems.First(x => x.DeviceId == paletteItemId));
+
+        // 3) die World-Koordinaten als Node-Position verwenden
+        node.Position = new Point(snappedWorldX, snappedWorldY);
+
+        node.AddPort(PortAlignment.Top);
+        node.AddPort(PortAlignment.Bottom);
+
+        Diagram.Nodes.Add(node);
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        Diagram.Options.GridSize = GridSize;
+
+        Diagram.RegisterComponent<DeviceNodeModel, DeviceCardNode>();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await PortalDevices.InitializeAsync();
+        PaletteItems = PortalDevices.GetDevices();
+        PortalDevices.OnChange += () =>
+        {
+            var devices = PortalDevices.GetDevices();
+            foreach(var node in Diagram.Nodes)
+            {
+                if(node is DeviceNodeModel deviceNode && devices.FirstOrDefault(x => x.DeviceId == deviceNode.Model.DeviceId) is DeviceViewModel model)
+                {
+                    deviceNode.Model = model;
+                    deviceNode.Refresh();
+                }
+            }
+            Diagram.Refresh();            
+        };
+    }
+
+    public void Dispose()
+    {
+        _objRef?.Dispose();
+
+        Task.Run(async () =>
+        {
+            try
+            {
+                await DiagramCanvas.DisposeAsync();
+            }
+            catch (JSDisconnectedException ex)
+            {
+
+            }
+        });
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            _objRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("floorplannerInterop.init", _objRef);
+        }
+    }
+}
