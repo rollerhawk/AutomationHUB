@@ -72,9 +72,9 @@ public static class ServiceCollectionExtensions
     public static IApplicationBuilder UseElsaDependencies(this IApplicationBuilder app)
     {
         // Configure CORS to allow designer app hosted on a different origin to invoke the APIs.
-        app.UseHttpsRedirection();
-        app.UseRouting(); // Required for SignalR.
+        app.UseHttpsRedirection();        
         app.UseCors();
+        app.UseRouting(); // Required for SignalR.
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseWorkflowsApi(); // Use Elsa API endpoints.

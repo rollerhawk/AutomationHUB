@@ -17,7 +17,7 @@
     </MudText>
 </MudCardHeader>
 <MudCardContent Class="pl-3 pr-3">
-    <MudGrid GutterSize="2">
+    <MudGrid GutterSize="2" Class="justify-center">
         @if (Device.Metadata == null)
         {
             <MudItem xs="12" Class="d-flex align-center justify-center">
@@ -35,7 +35,7 @@
         {
             @foreach (var kv in Device.Metadata)
             {
-                <MudItem xs="12">
+                <MudItem xs="12" Class="pt-2">
                     <div style="display:flex; justify-content:space-between; align-items: center; padding:4px 0;">
                         <span style="font-weight:500; color:rgba(0,0,0,0.7);">
                             @kv.Key

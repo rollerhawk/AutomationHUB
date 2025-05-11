@@ -9,7 +9,7 @@ namespace AutomationHUB.Portal.Services;
 public class PortalDeviceService
 {
     private readonly IDeviceConfigurationService _cfgClient;
-    private readonly IDeviceStateService _stateClient;
+    private readonly IDeviceStateClient _stateClient;
 
     private readonly Dictionary<string, DeviceConfiguration> _configs
         = new();
@@ -20,11 +20,13 @@ public class PortalDeviceService
 
     public PortalDeviceService(
         IDeviceConfigurationService cfgClient,
-        IDeviceStateService stateClient)
+        IDeviceStateClient stateClient)
     {
         _cfgClient = cfgClient;
         _stateClient = stateClient;
-        _stateClient.OnDeviceChanged += HandleDeviceMessage;
+
+        _stateClient.OnMessage += HandleDeviceMessage;
+        _ = _stateClient.StartAsync();
     }
 
     public async Task InitializeAsync()
@@ -36,9 +38,9 @@ public class PortalDeviceService
         OnChange?.Invoke();
     }
 
-    private void HandleDeviceMessage(string deviceId, DeviceMessage msg)
+    private void HandleDeviceMessage(DeviceMessage msg)
     {
-        _messages[deviceId] = msg;
+        _messages[msg.Id] = msg;
         OnChange?.Invoke();
     }
 

@@ -1,5 +1,6 @@
 using AutomationHUB.Engine.Api.Contracts;
 using AutomationHUB.Engine.Api.Services;
+using AutomationHUB.Engine.Api.SignalR;
 using AutomationHUB.Engine.Elsa.Extensions;
 using AutomationHUB.Engine.Elsa.MessageConsumers;
 using AutomationHUB.Engine.Services.Subscribers;
@@ -39,8 +40,11 @@ builder.Services.AddHostedService<DomainSubscriberHostedService<RegistryMessage>
 
 //Messaging
 builder.Services.AddAutomationMessageConsumer<DeviceMessage, DeviceMessageElsaConsumer>();
+builder.Services.AddAutomationMessageConsumer<DeviceMessage, DeviceMessageSignalRPublisher>();
 
 builder.Services.AddSingleton<IDeviceConfigurationService, DeviceConfigurationService>();
+
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -56,5 +60,7 @@ if (app.Environment.IsDevelopment())
 app.UseElsaDependencies();
 
 app.MapControllers();
+
+app.MapHub<DeviceHub>(SignalRRoutes.DeviceHubPath);
 
 app.Run("https://localhost:5001");

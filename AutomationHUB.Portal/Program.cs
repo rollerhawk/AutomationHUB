@@ -1,9 +1,5 @@
-using AutomationHUB.Portal;
 using AutomationHUB.Portal.Components;
-using AutomationHUB.Portal.ElsaStudio.Extensions;
 using AutomationHUB.Portal.Services;
-using Elsa.Api.Client.HttpMessageHandlers;
-using Elsa.Studio.Components;
 using Elsa.Studio.Contracts;
 using Elsa.Studio.Core.BlazorServer.Extensions;
 using Elsa.Studio.Extensions;
@@ -17,14 +13,8 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using MudBlazor.Services;
 using Microsoft.AspNetCore.Components.Web;
 using AutomationHUB.Portal.HttpMessageHandlers;
-using Elsa.Studio.Login.HttpMessageHandlers;
 using AutomationHUB.Engine.Api.Contracts;
-using AutomationHUB.Messaging.Devices;
-using AutomationHUB.Messaging.Extensions;
-using AutomationHUB.Messaging.Registry;
-using AutomationHUB.Messaging.Nats.Extensions;
-using AutomationHUB.Engine.Services.Subscribers;
-using AutomationHUB.Messaging.Interfaces;
+using Microsoft.AspNetCore.SignalR.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -69,6 +59,8 @@ builder.Services.Replace(ServiceDescriptor.Scoped<IRemoteBackendAccessor, Compon
 builder.Services.AddWorkflowsModule();
 builder.Services.AddScoped<ITimeZoneProvider, LocalTimeZoneProvider>();
 
+builder.Services.AddTransient<AuthHttpMessageHandler>();
+
 builder.Services
 .AddHttpClient<IDeviceConfigurationService, DeviceConfigurationClient>(client =>
 {
@@ -76,24 +68,24 @@ builder.Services
     client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("ApiKey", Guid.Empty.ToString());
 });
 
-//Nats
-builder.Services.AddNats(configuration);
-builder.Services.AddNatsSubscriber();
-//Messaging
-builder.Services.AddHostedService<DomainSubscriberHostedService<DeviceMessage>>();
+//SignalR
+// In your Portal DI setup
+builder.Services.AddScoped(sp =>
+{
+    return new HubConnectionBuilder()
+        .WithUrl(new Uri($"https://localhost:5001{SignalRRoutes.DeviceHubPath}"), options => options.Headers.Add("ApiKey", Guid.Empty.ToString()))      
+        .WithAutomaticReconnect()
+        .Build();
+});
 
 //Messaging
-builder.Services.AddSingleton<DeviceStateService>();
-builder.Services.AddSingleton<IDeviceStateService,DeviceStateService>(sp => sp.GetRequiredService<DeviceStateService>());
-builder.Services.AddSingleton<IMessageConsumer<DeviceMessage>, DeviceStateService>(sp=> sp.GetRequiredService<DeviceStateService>());
-
-builder.Services.AddSingleton<PortalDeviceService>();
+builder.Services.AddScoped<IDeviceStateClient, DeviceStateClient>();
+builder.Services.AddScoped<PortalDeviceService>();
 
 // Build the application.
 var app = builder.Build();
 
 app.UseHttpsRedirection();
-
 
 app.UseStaticFiles();
 app.UseAntiforgery();

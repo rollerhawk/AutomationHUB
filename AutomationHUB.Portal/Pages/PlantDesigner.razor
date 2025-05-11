@@ -44,6 +44,9 @@
 
     <!-- CANVAS RECHTS -->
     <div id="myCanvas" class="diagram-container" style="flex:1; position:relative;">
+        <MudButton Style="position: absolute; top: 8px; right: 8px; z-index: 1000;" Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add">
+            Add Station
+        </MudButton>
         <CascadingValue Value="Diagram">
             <DiagramCanvas @ref="DiagramCanvas">
                 <Widgets>

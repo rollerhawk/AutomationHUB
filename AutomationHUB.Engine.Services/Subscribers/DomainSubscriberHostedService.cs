@@ -64,32 +64,54 @@ public abstract class DomainSubscriberHostedService : BackgroundService
         }
     }
 
-    protected virtual async Task ProcessMessageAsync<T>(T message, CancellationToken ct) where T : AutomationMessage
+
+    protected virtual async Task ProcessMessageAsync(AutomationMessage message, CancellationToken ct)
     {
         // ermittle den tatsächlichen CLR-Typ
         var messageType = message.GetType();
 
-        _logger.LogInformation(
-                      "Received {MessageType} (@{Subject})",
-                      messageType.Name, _subjectPattern);
-
-        // baue das generic Interface IConsumer<messageType>
-        var consumerInterface = typeof(IMessageConsumer<>).MakeGenericType(messageType);
+        _logger.LogInformation("Received {MessageType} (@{Subject})", messageType.Name, _subjectPattern);
 
         // 1) Erstelle einen neuen Scope pro Nachricht
         using var scope = _serviceProvider.CreateScope();
 
+        // 2) baue das generic Interface IConsumer<messageType>
+        var consumerInterface = typeof(IMessageConsumer<>).MakeGenericType(messageType);
+
         // 2) Hole den scoped Consumer aus genau diesem Scope
-        var consumer = scope.ServiceProvider
-                             .GetRequiredService(consumerInterface);
-
-        var method = consumerInterface.GetMethod(nameof(IMessageConsumer<T>.HandleAsync), new[] { messageType, typeof(CancellationToken) }) ?? throw new InvalidOperationException("HandleAsync(DeviceMessage, CancellationToken) nicht gefunden.");
-
-        // 3) Rufe es auf – Invoke liefert ein object zurück, das ein Task ist
-        await (Task)method.Invoke(
-            consumer,
-            new object[] { message, ct })!;
+        foreach (var consumer in scope.ServiceProvider.GetServices(consumerInterface))
+        {
+            var method = consumerInterface.GetMethod(nameof(IMessageConsumer<AutomationMessage>.HandleAsync), new[] { messageType, typeof(CancellationToken) }) ?? throw new InvalidOperationException($"HandleAsync({messageType.Name}, CancellationToken) nicht gefunden.");
+            await (Task)method.Invoke(consumer, [message, ct])!;
+        }
     }
+
+    //protected virtual async Task ProcessMessageAsync<T>(T message, CancellationToken ct) where T : AutomationMessage
+    //{
+    //    // ermittle den tatsächlichen CLR-Typ
+    //    var messageType = message.GetType();
+
+    //    _logger.LogInformation(
+    //                  "Received {MessageType} (@{Subject})",
+    //                  messageType.Name, _subjectPattern);
+
+    //    // baue das generic Interface IConsumer<messageType>
+    //    var consumerInterface = typeof(IMessageConsumer<>).MakeGenericType(messageType);
+
+    //    // 1) Erstelle einen neuen Scope pro Nachricht
+    //    using var scope = _serviceProvider.CreateScope();
+
+    //    // 2) Hole den scoped Consumer aus genau diesem Scope
+    //    var consumer = scope.ServiceProvider
+    //                         .GetRequiredService(consumerInterface);
+
+    //    var method = consumerInterface.GetMethod(nameof(IMessageConsumer<T>.HandleAsync), new[] { messageType, typeof(CancellationToken) }) ?? throw new InvalidOperationException("HandleAsync(DeviceMessage, CancellationToken) nicht gefunden.");
+
+    //    // 3) Rufe es auf – Invoke liefert ein object zurück, das ein Task ist
+    //    await (Task)method.Invoke(
+    //        consumer,
+    //        new object[] { message, ct })!;
+    //}
 }
 
 /// <summary>

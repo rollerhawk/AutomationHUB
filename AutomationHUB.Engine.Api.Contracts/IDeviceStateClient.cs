@@ -7,9 +7,12 @@ using System.Threading.Tasks;
 
 namespace AutomationHUB.Engine.Api.Contracts
 {
-    public interface IDeviceStateService
+    public interface IDeviceStateClient
     {
         /// <summary>Wird gefeuert, wenn für ein Gerät eine neue Nachricht ankommt.</summary>
-        event Action<string, DeviceMessage>? OnDeviceChanged;
+        event Action<DeviceMessage>? OnMessage;
+
+        /// <summary>Start the SignalR connection and subscription.</summary>
+        Task StartAsync();
     }
 }
