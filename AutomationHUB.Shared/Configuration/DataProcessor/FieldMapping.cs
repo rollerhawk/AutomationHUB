@@ -1,5 +1,5 @@
 ﻿using System.Text.Json.Serialization;
-using AutomationHUB.Shared.Enums;
+using AutomationHUB.Shared.Enum;
 
 namespace AutomationHUB.Shared.Configuration.DataProcessor;
 

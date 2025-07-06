@@ -1,6 +1,6 @@
 ﻿using AutomationHUB.DeviceContainer.Connectors;
 using AutomationHUB.Shared.Configuration;
-using AutomationHUB.Shared.Enums;
+using AutomationHUB.Shared.Enum;
 
 namespace AutomationHUB.DeviceContainer.Factories
 {

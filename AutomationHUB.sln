@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomationHUB.Portal.ElsaSt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomationHUB.Engine.Api.Contracts", "AutomationHUB.Engine.Api.Contracts\AutomationHUB.Engine.Api.Contracts.csproj", "{3DC8C521-A0D2-4F53-A18E-7FD6B349793A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomationHUB.DeviceContainerApp", "AutomationHUB.DeviceContainerApp\AutomationHUB.DeviceContainerApp.csproj", "{1E7C58D5-1BC0-480C-8753-A5ECCA551300}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{3DC8C521-A0D2-4F53-A18E-7FD6B349793A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3DC8C521-A0D2-4F53-A18E-7FD6B349793A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3DC8C521-A0D2-4F53-A18E-7FD6B349793A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E7C58D5-1BC0-480C-8753-A5ECCA551300}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E7C58D5-1BC0-480C-8753-A5ECCA551300}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E7C58D5-1BC0-480C-8753-A5ECCA551300}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E7C58D5-1BC0-480C-8753-A5ECCA551300}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using AutomationHUB.Shared.Configuration.DataProcessor;
-using AutomationHUB.Shared.Enums;
+using AutomationHUB.Shared.Enum;
 
 namespace AutomationHUB.Shared.Configuration;
 

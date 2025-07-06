@@ -10,33 +10,22 @@ namespace AutomationHUB.DeviceContainer
 {
     public class DeviceService(
     ILogger<DeviceService> logger,
-    IConfiguration config,
+    IDeviceConfigLoader deviceConfigLoader,
     IDeviceConnectorFactory connectorFactory,
     IByteDataProcessorFactory processorFactory,
-    JsonDeviceConfigLoader loader,
     IPublisher publisher) : BackgroundService
     {
         private readonly ILogger<DeviceService> _logger = logger;
-        private readonly IConfiguration _configuration = config;
         private readonly IDeviceConnectorFactory _connectorFactory = connectorFactory;
         private readonly IByteDataProcessorFactory _processorFactory = processorFactory;
-        private readonly JsonDeviceConfigLoader _loader = loader;
         private readonly IPublisher _publisher = publisher;
-        private DeviceConfiguration _deviceConfig = null!;
+        private readonly DeviceConfiguration _deviceConfig = deviceConfigLoader.GetConfig() ?? throw new InvalidOperationException("Device configuration is null. Ensure the config loader is properly set up.");
 
         protected override async Task ExecuteAsync(CancellationToken ct)
         {
             _logger.LogInformation("Device running at: {time}", DateTimeOffset.Now);
             try
             {
-                if (_configuration["DeviceConfigPath"] is not string cfgPath)
-                {
-                    _logger.LogError("Device config path not set in configuration.");
-                    return;
-                }
-
-                _deviceConfig = await _loader.LoadAsync(cfgPath, ct);
-
                 _logger.LogInformation("Loaded device config: {config}", _deviceConfig);
 
                 var processor = _processorFactory.Create(_deviceConfig.ProcessorConfig);

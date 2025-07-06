@@ -1,4 +1,4 @@
-﻿namespace AutomationHUB.Shared.Enums;
+﻿namespace AutomationHUB.Shared.Enum;
 
 public enum FieldType
 {

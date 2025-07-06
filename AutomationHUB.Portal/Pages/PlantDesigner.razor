@@ -1,4 +1,5 @@
 ﻿@page "/plant-designer"
+@using AutomationHUB.Portal.Diagrams.Behaviors
 @using AutomationHUB.Portal.Diagrams.Models
 @using AutomationHUB.Portal.Diagrams.Nodes
 @using AutomationHUB.Portal.PaletteItems
@@ -8,6 +9,8 @@
 @using Blazor.Diagrams
 @using Blazor.Diagrams.Components
 @using Blazor.Diagrams.Components.Widgets
+@using Blazor.Diagrams.Core
+@using Blazor.Diagrams.Core.Behaviors
 @using Blazor.Diagrams.Core.Geometry
 @using Blazor.Diagrams.Core.Models
 @using Blazor.Diagrams.Core.PathGenerators
@@ -44,12 +47,13 @@
 
     <!-- CANVAS RECHTS -->
     <div id="myCanvas" class="diagram-container" style="flex:1; position:relative;">
-        <MudButton Style="position: absolute; top: 8px; right: 8px; z-index: 1000;" Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add">
+        <MudButton Style="position: absolute; top: 8px; right: 8px; z-index: 1000;" Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@OnAddStationClicked">
             Add Station
         </MudButton>
         <CascadingValue Value="Diagram">
             <DiagramCanvas @ref="DiagramCanvas">
                 <Widgets>
+                    <SelectionBoxWidget />
                     <GridWidget Size="@GridSize" Mode="GridMode.Line" BackgroundColor="white" />
                 </Widgets>
             </DiagramCanvas>
@@ -63,12 +67,6 @@
     ElementReference paletteDiv;
 
     IEnumerable<DeviceViewModel> PaletteItems = Array.Empty<DeviceViewModel>();
-    //   = new()
-    // {
-    //   new("scanner", "Scanner STXETX", Icons.Material.Outlined.QrCodeScanner, true, DateTime.Now),
-    //   new("scale",  "Waage Bizerba", Icons.Material.Outlined.Scale, true, DateTime.Now),
-    //   new("scale",  "Waage Generic", Icons.Material.Outlined.LinearScale, true, DateTime.Now)
-    // };
 
     IEnumerable<IGrouping<string, DeviceViewModel>> GroupedItems => PaletteItems.GroupBy(x => x.DeviceType);
 
@@ -79,30 +77,82 @@
 
     private int GridSize { get; set; } = 25;
 
+    public void OnAddStationClicked()
+    {
+        var oldSelectionBehavior = Diagram.GetBehavior<SelectionBehavior>()!;
+        Diagram.UnregisterBehavior<SelectionBehavior>();        
+        Diagram.RegisterBehavior(new GroupDrawingBehavior(Diagram, oldSelectionBehavior));
+    }
+
+    [JSInvokable]
+    public async Task OnDroppedInStation(string? paletteItemId, string? stationId, double x, double y)
+    {
+        Console.WriteLine($"Item {paletteItemId} dropped into Station ({stationId})");
+
+        var groupModel = Diagram.Groups.FirstOrDefault(station => station.Id == stationId);
+
+        //TODO abhandeln, wenne es bereits existierende DeviceNodeModel ist.
+        var node = new DeviceNodeModel(PaletteItems.First(x => x.DeviceId == paletteItemId));
+
+        if (groupModel is StationModel stationNode)
+        {
+            Console.WriteLine($"Station found!");
+
+            var point = Diagram.GetRelativeMousePoint(x, y);
+
+            // Find all existing devices inside the dropzone
+            var existingDevices = stationNode.Children.OfType<DeviceNodeModel>().ToList();
+
+            Point positionToPlace;
+
+            if (existingDevices.Count == 0)
+            {
+                // First device → start at bounding point of the dropzone
+                positionToPlace = point;
+            }
+            else
+            {
+                // Get last device position + size
+                var last = existingDevices.Last();
+
+                var nextX = last.Position.X + last.Size.Width + GridSize;
+                var nextY = last.Position.Y;
+
+                positionToPlace = new Point(nextX, nextY);
+            }
+
+            node.Position = positionToPlace;   
+            Diagram.Nodes.Add(node);
+            stationNode.AddChild(node);
+        }
+    }
+
     [JSInvokable]
     public async Task OnGhostDropped(string? paletteItemId, double x, double y)
     {
         // hier fügst du in C# deine Node an Position (x,y) ins Canvas ein
         Console.WriteLine($"Item {paletteItemId} dropped at ({x}, {y})");
 
-        // 1) Screen → World
-        var worldX = (x - Diagram.Pan.X) / Diagram.Zoom;
-        var worldY = (y - Diagram.Pan.Y) / Diagram.Zoom;
-
-        // 2) im World-Raum auf das Grid runden
-        var snappedWorldX = Math.Floor(worldX / GridSize) * GridSize;
-        var snappedWorldY = Math.Floor(worldY / GridSize) * GridSize;
+        var point = Diagram.GetRelativeMousePoint(x, y);
 
         // Neue Node mit Hintergrund-Farbe aus der Palette
         var node = new DeviceNodeModel(PaletteItems.First(x => x.DeviceId == paletteItemId));
 
         // 3) die World-Koordinaten als Node-Position verwenden
-        node.Position = new Point(snappedWorldX, snappedWorldY);
-
+        node.Position = point;
         node.AddPort(PortAlignment.Top);
         node.AddPort(PortAlignment.Bottom);
 
         Diagram.Nodes.Add(node);
+
+        var padding = (byte)(GridSize / 2);
+
+        var station = new StationModel([], padding: 35)
+        {
+            Title = $"{node.Model.DisplayName}_Station"
+        };
+        station.AddChild(node);
+        Diagram.Groups.Add(station);
     }
 
     protected override void OnInitialized()
@@ -110,8 +160,16 @@
         base.OnInitialized();
 
         Diagram.Options.GridSize = GridSize;
-
+        Diagram.Options.AllowMultiSelection = true;
+        Diagram.Options.Groups.Enabled = true;
+        Diagram.Options.Groups.Factory = (diagram, children) =>
+        {
+            var group = new StationModel(children);
+            Diagram.Groups.Add(group);
+            return group;
+        };
         Diagram.RegisterComponent<DeviceNodeModel, DeviceCardNode>();
+        Diagram.RegisterComponent<StationModel, StationNode>();
     }
 
     protected override async Task OnInitializedAsync()
@@ -156,7 +214,7 @@
         if (firstRender)
         {
             _objRef = DotNetObjectReference.Create(this);
-            await JS.InvokeVoidAsync("floorplannerInterop.init", _objRef);
+            await JS.InvokeVoidAsync("floorplannerInterop.init", _objRef);            
         }
     }
 }

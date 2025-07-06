@@ -3,6 +3,7 @@ using AutomationHUB.Engine.Api.Services;
 using AutomationHUB.Engine.Api.SignalR;
 using AutomationHUB.Engine.Elsa.Extensions;
 using AutomationHUB.Engine.Elsa.MessageConsumers;
+using AutomationHUB.Engine.Services.Hosting;
 using AutomationHUB.Engine.Services.Subscribers;
 using AutomationHUB.Messaging.Devices;
 using AutomationHUB.Messaging.Extensions;
@@ -32,8 +33,13 @@ builder.Services.AddCors(cors => cors
 builder.Services.AddElsaDependencies(configuration);
 
 //Nats
-builder.Services.AddNats(configuration);
+builder.Services.ConfigureNatsOptions(configuration);
+builder.Services.AddNats();
 builder.Services.AddNatsSubscriber();
+//HostedServices
+builder.Services.AddSingleton<IDeviceContainerHostService, DeviceContainerHostService>();
+builder.Services.AddHostedService<DeviceContainerOrchestratorService>();
+
 //Messaging
 builder.Services.AddHostedService<DomainSubscriberHostedService<DeviceMessage>>();
 builder.Services.AddHostedService<DomainSubscriberHostedService<RegistryMessage>>();

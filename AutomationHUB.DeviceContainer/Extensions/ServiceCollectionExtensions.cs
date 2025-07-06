@@ -16,18 +16,34 @@ namespace AutomationHUB.DeviceContainer.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddDeviceContainerDependencies(this IServiceCollection services)
+        public static IServiceCollection AddConsoleLogging(this IServiceCollection services)
         {
-            services.AddHostedService<DeviceService>();
-            services.AddSingleton<IDeviceConnectorFactory, DeviceConnectorFactory>();
-            services.AddSingleton<IByteDataProcessorFactory, ByteDataProcessorFactory>();
-            services.AddSingleton<JsonDeviceConfigLoader>();
-
             services.AddLogging(config =>
             {
                 config.AddConsole();
                 config.SetMinimumLevel(LogLevel.Debug);
             });
+            return services;
+        }
+
+        public static IServiceCollection AddDeviceConfigLoader<T>(this IServiceCollection services, T instance = null) where T : class, IDeviceConfigLoader
+        {
+            if(instance == null)
+            {
+                services.AddSingleton<IDeviceConfigLoader, T>();
+            }
+            else
+            {
+                services.AddSingleton<IDeviceConfigLoader>(instance);
+            }
+            return services;
+        }
+
+        public static IServiceCollection AddDeviceContainerDependencies(this IServiceCollection services)
+        {
+            services.AddHostedService<DeviceService>();
+            services.AddSingleton<IDeviceConnectorFactory, DeviceConnectorFactory>();
+            services.AddSingleton<IByteDataProcessorFactory, ByteDataProcessorFactory>();            
             return services;
         }
     }

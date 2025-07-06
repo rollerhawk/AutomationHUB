@@ -1,5 +1,5 @@
 ﻿using AutomationHUB.Shared.Configuration.DataProcessor;
-using AutomationHUB.Shared.Enums;
+using AutomationHUB.Shared.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;

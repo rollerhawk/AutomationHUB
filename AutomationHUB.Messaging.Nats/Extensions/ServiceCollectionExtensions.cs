@@ -14,15 +14,24 @@ namespace AutomationHUB.Messaging.Nats.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddNats(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection ConfigureNatsOptions(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<NatsOptions>(config.GetSection("Nats"));
+            services.Configure<NatsOptions>(configuration.GetSection("Nats"));
+            return services;
+        }
 
+        public static IServiceCollection ConfigureNatsOptions(this IServiceCollection services, NatsOptions options)
+        {
+            services.AddSingleton<IOptions<NatsOptions>>(Microsoft.Extensions.Options.Options.Create(options));
+            return services;
+        }
+
+        public static IServiceCollection AddNats(this IServiceCollection services)
+        {
             services.AddSingleton<IConnection>(sp =>
             {
-                var options = sp.GetRequiredService<IOptions<NatsOptions>>().Value;
                 var cfOpts = ConnectionFactory.GetDefaultOptions();
-                cfOpts.Url = options.Url;
+                cfOpts.Url = sp.GetRequiredService<IOptions<NatsOptions>>().Value.Url;
                 return new ConnectionFactory().CreateConnection(cfOpts);
             });
 

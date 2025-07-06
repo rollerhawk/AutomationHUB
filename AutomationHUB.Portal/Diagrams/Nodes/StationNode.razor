@@ -1,0 +1,31 @@
+﻿@using AutomationHUB.Portal.Diagrams.Models
+@using AutomationHUB.Portal.Diagrams.Nodes
+@using Blazor.Diagrams.Components
+@using Blazor.Diagrams.Components.Renderers
+@inject IJSRuntime JS
+
+<MudCard Width="100%" Height="100%" Class="station-node" Elevation="4" id="@Group.Id">
+    <MudCardHeader Style="
+                        position: relative;
+                        display: flex;
+                        height: 30px;
+                        align-items: center;
+                        justify-content: center;
+                        border-radius: 0;
+                        background-color: #f5f5f5;
+    ">
+        <MudText Typo="Typo.h6"
+                 Style="margin-left:8px;">
+            <b>@Group.Title</b>
+        </MudText>
+    </MudCardHeader>    
+    <MudCardContent>
+        @* This is required and it's what renders the children *@
+        <GroupNodes Group="Group" />
+        <MudButton Style="right:0;bottom:0; height:21px; width:171px" Class="mb-1 mr-1 absolute" Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add">Add Workflow</MudButton>
+    </MudCardContent>
+</MudCard>
+@code {
+    // This gets filled by the library
+    [Parameter] public StationModel Group { get; set; } = default!;
+}
