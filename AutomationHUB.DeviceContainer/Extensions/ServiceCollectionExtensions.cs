@@ -26,7 +26,7 @@ namespace AutomationHUB.DeviceContainer.Extensions
             return services;
         }
 
-        public static IServiceCollection AddDeviceConfigLoader<T>(this IServiceCollection services, T instance = null) where T : class, IDeviceConfigLoader
+        public static IServiceCollection AddDeviceConfigLoader<T>(this IServiceCollection services, T? instance = null) where T : class, IDeviceConfigLoader
         {
             if(instance == null)
             {
