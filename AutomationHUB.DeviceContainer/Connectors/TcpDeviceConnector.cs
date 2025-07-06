@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using AutomationHUB.Shared.Configuration;
+using Microsoft.Extensions.Logging;
 using System.Net.Sockets;
 using System.Text;
 
@@ -7,16 +8,18 @@ namespace AutomationHUB.DeviceContainer.Connectors
     public class TcpDeviceConnector : IDeviceConnector
     {
         private readonly ILogger _logger;
+        private readonly TcpConnectionInfo _config;
         private readonly string _host;
         private readonly int _port;
-
 
         private TcpClient? _client;
         private NetworkStream? _stream;
 
-        public TcpDeviceConnector(string address, ILogger<TcpDeviceConnector> logger)
-        {   
-            // address im Format "hostname:port"
+        public TcpDeviceConnector(TcpConnectionInfo config, ILogger<TcpDeviceConnector> logger)
+        {
+            _config = config;
+            var address = config.Address;
+
             var parts = address.Split(':', StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length != 2 || !int.TryParse(parts[1], out _port))
                 throw new ArgumentException($"Invalid TCP address: '{address}'. Expected 'host:port'.", nameof(address));
@@ -27,20 +30,25 @@ namespace AutomationHUB.DeviceContainer.Connectors
 
         public async Task<bool> ConnectAsync(CancellationToken ct = default)
         {
-            try
+            while (!ct.IsCancellationRequested)
             {
-                _logger.LogInformation("TCP connect to {Host}:{Port}", _host, _port);
-                _client = new TcpClient();
-                await _client.ConnectAsync(_host, _port, ct);
-                _stream = _client.GetStream();
-                _logger.LogInformation("TCP connected to {Host}:{Port}", _host, _port);
-                return true;
+                try
+                {
+                    _logger.LogInformation("Attempting TCP connect to {Host}:{Port}", _host, _port);
+                    _client = new TcpClient();
+                    await _client.ConnectAsync(_host, _port, ct);
+                    _stream = _client.GetStream();
+                    _logger.LogInformation("TCP connected to {Host}:{Port}", _host, _port);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "TCP connect failed to {Host}:{Port}. Retrying in {_config.ReconnectDelaySeconds} seconds.", _host, _port, _config.ReconnectDelaySeconds);
+                    await Task.Delay(TimeSpan.FromSeconds(_config.ReconnectDelaySeconds), ct);
+                }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to connect to TCP {Host}:{Port}", _host, _port);
-                return false;
-            }
+
+            return false;
         }
 
         public async Task<byte[]> ReadAsync(CancellationToken ct = default)
@@ -51,7 +59,6 @@ namespace AutomationHUB.DeviceContainer.Connectors
             using var ms = new MemoryStream();
             var buffer = new byte[4096];
 
-            // erst warten, bis Daten da sind
             while (!_stream.DataAvailable)
             {
                 _logger.LogDebug("Waiting for data on TCP {Host}:{Port}", _host, _port);
@@ -93,5 +100,6 @@ namespace AutomationHUB.DeviceContainer.Connectors
             }
             return Task.CompletedTask;
         }
-    }    
+    }
+
 }

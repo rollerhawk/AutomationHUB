@@ -53,7 +53,10 @@ public class PortalDeviceService
 
             // statische Meta
             vm.StaticMeta["Protocol"] = cfg.Connection.Protocol;
-            vm.StaticMeta["Address"] = cfg.Connection.Address;
+            if(cfg.Connection is TcpConnectionInfo tcp)
+            {
+                vm.StaticMeta["Address"] = tcp.Address;
+            }            
             // hier weitere Felder aus cfg.ProcessorConfig…
 
             // dynamische Meta

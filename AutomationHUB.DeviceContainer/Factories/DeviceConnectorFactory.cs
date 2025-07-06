@@ -4,7 +4,7 @@ using AutomationHUB.Shared.Enum;
 
 namespace AutomationHUB.DeviceContainer.Factories
 {
-    public class DeviceConnectorFactory(IServiceProvider sp) : IDeviceConnectorFactory
+    public class DeviceConnectorFactory(IServiceProvider sp, IConfiguration configuration) : IDeviceConnectorFactory
     {
         private readonly IServiceProvider _sp = sp;
 
@@ -12,9 +12,14 @@ namespace AutomationHUB.DeviceContainer.Factories
         {
             return cfg.Connection.Protocol switch
             {
-                ProtocolType.TCP => ActivatorUtilities.CreateInstance<TcpDeviceConnector>(_sp, cfg.Connection.Address),                
+                ProtocolType.TCP => CreateTcpDeviceConnector((TcpConnectionInfo)cfg.Connection),
                 _ => throw new NotSupportedException($"Protocol {cfg.Connection.Protocol} is not supported")
             };
+        }
+
+        private TcpDeviceConnector CreateTcpDeviceConnector(TcpConnectionInfo cfg)
+        {
+            return ActivatorUtilities.CreateInstance<TcpDeviceConnector>(_sp, cfg);
         }
     }
 }
